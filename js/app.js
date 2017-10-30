@@ -10,7 +10,15 @@
  *   - add each card's HTML to the page
  */
 
-// Shuffle function from http://stackoverflow.com/a/2450976
+// Shuffle function import swal from 'sweetalert'from http://stackoverflow.com/a/2450976
+
+
+var moveCount = 0;
+var selectedCards = [];
+var rightCount = 0;
+var cardCSSArray = ["fa fa-diamond","fa fa-paper-plane-o","fa fa-anchor","fa fa-bolt","fa fa-cube","fa fa-anchor","fa fa-leaf","fa fa-bicycle",
+	"fa fa-diamond","fa fa-bomb","fa fa-leaf","fa fa-bomb","fa fa-bolt","fa fa-bicycle","fa fa-paper-plane-o","fa fa-cube"];
+
 function shuffle(array) {
     var currentIndex = array.length, temporaryValue, randomIndex;
 
@@ -24,6 +32,85 @@ function shuffle(array) {
 
     return array;
 }
+function createRandomCard() {
+	cardCSSArray = shuffle(cardCSSArray);
+	$(document).ready(function(){
+		$("li.card").each(function(index, element) {
+		$(element).removeClass('open show match');
+		$(element).context.innerHTML = '<i class="'+ cardCSSArray[index]  +'"></i>'
+		});
+	});
+	return cardCSSArray;
+
+}
+function handleStar() {
+	moveCount++;
+	$('.moves').text(moveCount);
+	if (moveCount > 30) {
+		$('.stars').empty();
+		$('.stars').append('<li><i class="fa fa-star-o"></i></li>', '<li><i class="fa fa-star-o"></i></li>', '<li><i class="fa fa-star-o"></i></li>');
+	} else if (moveCount > 14) {
+		$('.stars').empty();
+		$('.stars').append('<li><i class="fa fa-star"></i></li>', '<li><i class="fa fa-star-o"></i></li>', '<li><i class="fa fa-star-o"></i></li>');
+	} else if  (moveCount > 7)  {
+		$('.stars').empty();
+		$('.stars').append('<li><i class="fa fa-star"></i></li>', '<li><i class="fa fa-star"></i></li>', '<li><i class="fa fa-star-o"></i></li>');
+	}
+}
+function matchCard() {
+	if (selectedCards[0].html() === selectedCards[1].html()) {
+		for (var card of selectedCards){
+			card.removeClass('open show').addClass('match')
+			rightCount++;
+			if (rightCount === cardCSSArray.length) {
+				swal("恭喜", "你以"+moveCount+"步的成绩完成", "success", {
+  						button: "重新开始",
+
+				}).then(function(){
+					restartGame();
+				});
+			}
+		}
+	} else {
+		for (var card of selectedCards){
+			card.removeClass('open show');
+		}
+	}
+	selectedCards = [];
+}
+function bindEvent() {
+	//restart
+	$('.restart').click(function() {
+	restartGame();
+});
+	//card
+	$('.card').click(function() {
+		if($(this).hasClass('match') || $(this).hasClass('open') || $(this).hasClass('show')) {
+			//不执行操作
+		} else {
+			$(this).addClass('open show')
+			selectedCards.push($(this));
+			
+			if (selectedCards.length > 1) {
+				handleStar();
+				setTimeout(matchCard, 1000);
+			}	
+		}
+	});
+}
+function restartGame(){
+	createRandomCard();
+	moveCount = 0;
+	rightCount = 0;
+	selectedCards = [];
+	$('.stars').empty();
+    $('.stars').append('<li><i class="fa fa-star"></i></li>', '<li><i class="fa fa-star"></i></li>', '<li><i class="fa fa-star"></i></li>');
+    $('.moves').text(moveCount);
+}
+createRandomCard();
+bindEvent()
+
+
 
 
 /*
