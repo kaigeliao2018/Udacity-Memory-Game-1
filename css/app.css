@@ -102,7 +102,11 @@ h1 {
     list-style: none;
     display: inline-block;
 }
-
+.score-panel .secondsTip {
+    float: right;
+    font-size: 1em;
+    margin-right: 10px;
+}
 .score-panel .restart {
     float: right;
     cursor: pointer;

@@ -18,6 +18,9 @@ var selectedCards = [];
 var rightCount = 0;
 var cardCSSArray = ["fa fa-diamond","fa fa-paper-plane-o","fa fa-anchor","fa fa-bolt","fa fa-cube","fa fa-anchor","fa fa-leaf","fa fa-bicycle",
 	"fa fa-diamond","fa fa-bomb","fa fa-leaf","fa fa-bomb","fa fa-bolt","fa fa-bicycle","fa fa-paper-plane-o","fa fa-cube"];
+var seconds = 0;
+
+
 
 function shuffle(array) {
     var currentIndex = array.length, temporaryValue, randomIndex;
@@ -32,6 +35,7 @@ function shuffle(array) {
 
     return array;
 }
+
 function createRandomCard() {
 	cardCSSArray = shuffle(cardCSSArray);
 	$(document).ready(function(){
@@ -43,13 +47,24 @@ function createRandomCard() {
 	return cardCSSArray;
 
 }
+function initialCard() {
+	cardCSSArray = shuffle(cardCSSArray);
+	$(document).ready(function(){
+		for (const card of cardCSSArray) {
+			$(".deck").append(`<li class="card"> <i class="${card}"></i> </li>`)
+		}
+		bindEvent()
+	});
+}
+//the logic of star's show
 function handleStar() {
 	moveCount++;
 	$('.moves').text(moveCount);
-	if (moveCount > 30) {
-		$('.stars').empty();
-		$('.stars').append('<li><i class="fa fa-star-o"></i></li>', '<li><i class="fa fa-star-o"></i></li>', '<li><i class="fa fa-star-o"></i></li>');
-	} else if (moveCount > 14) {
+	// if (moveCount > 30) {
+	// 	$('.stars').empty();
+	// 	$('.stars').append('<li><i class="fa fa-star-o"></i></li>', '<li><i class="fa fa-star-o"></i></li>', '<li><i class="fa fa-star-o"></i></li>');
+	// } else
+	if (moveCount > 14) {
 		$('.stars').empty();
 		$('.stars').append('<li><i class="fa fa-star"></i></li>', '<li><i class="fa fa-star-o"></i></li>', '<li><i class="fa fa-star-o"></i></li>');
 	} else if  (moveCount > 7)  {
@@ -57,32 +72,42 @@ function handleStar() {
 		$('.stars').append('<li><i class="fa fa-star"></i></li>', '<li><i class="fa fa-star"></i></li>', '<li><i class="fa fa-star-o"></i></li>');
 	}
 }
+//check card whether has same class
 function matchCard() {
 	if (selectedCards[0].html() === selectedCards[1].html()) {
 		for (var card of selectedCards){
-			card.removeClass('open show').addClass('match')
-			rightCount++;
-			if (rightCount === cardCSSArray.length) {
-				swal("恭喜", "你以"+moveCount+"步的成绩完成", "success", {
-  						button: "重新开始",
+			card.addClass('animated bounce')
+			setTimeout(function(){
+				card.removeClass('open show').addClass('match')
+				rightCount++;
+				if (rightCount === cardCSSArray.length) {
+   					swal("恭喜", `你共花费了${second}秒,获得${$('.fa-star').length}颗星`, "success", {
+	  						button: "重新开始",
 
-				}).then(function(){
-					restartGame();
-				});
-			}
+					}).then(function(){
+						restartGame();
+					});
+				}
+			},1000)
+			
 		}
 	} else {
 		for (var card of selectedCards){
-			card.removeClass('open show');
+			card.addClass('animated shake')
+			setTimeout(function(){
+				card.removeClass('open show');
+			},1000)
+			
 		}
 	}
 	selectedCards = [];
 }
+//bind restart button and card click event
 function bindEvent() {
 	//restart
 	$('.restart').click(function() {
 	restartGame();
-});
+	});
 	//card
 	$('.card').click(function() {
 		if($(this).hasClass('match') || $(this).hasClass('open') || $(this).hasClass('show')) {
@@ -93,22 +118,30 @@ function bindEvent() {
 			
 			if (selectedCards.length > 1) {
 				handleStar();
-				setTimeout(matchCard, 1000);
+				matchCard();
+				// setTimeout(matchCard, 1000);
 			}	
 		}
 	});
 }
+//restart game,initial data
 function restartGame(){
 	createRandomCard();
 	moveCount = 0;
 	rightCount = 0;
+	second = 0;
 	selectedCards = [];
 	$('.stars').empty();
     $('.stars').append('<li><i class="fa fa-star"></i></li>', '<li><i class="fa fa-star"></i></li>', '<li><i class="fa fa-star"></i></li>');
     $('.moves').text(moveCount);
 }
-createRandomCard();
-bindEvent()
+
+//execute
+initialCard();
+setInterval(function(){
+	seconds++;
+	$('.seconds').text(seconds);
+}, 1000)
 
 
 
