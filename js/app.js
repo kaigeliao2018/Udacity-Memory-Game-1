@@ -72,35 +72,44 @@ function handleStar() {
 		$('.stars').append('<li><i class="fa fa-star"></i></li>', '<li><i class="fa fa-star"></i></li>', '<li><i class="fa fa-star-o"></i></li>');
 	}
 }
-//check card whether has same class
+/*
+判断卡片是否相同
+#关于setTimeout的用法有点模糊,处理这块时写的代码觉得很奇怪,for(of)写了两次,是否有优化方法?
+*/
 function matchCard() {
 	if (selectedCards[0].html() === selectedCards[1].html()) {
-		for (var card of selectedCards){
-			card.addClass('animated bounce')
-			setTimeout(function(){
-				card.removeClass('open show').addClass('match')
-				rightCount++;
-				if (rightCount === cardCSSArray.length) {
-   					swal("恭喜", `你共花费了${second}秒,获得${$('.fa-star').length}颗星`, "success", {
-	  						button: "重新开始",
+		for (const card of selectedCards){
+			card.addClass('animated bounce');
+			rightCount++;
+			if (rightCount === cardCSSArray.length) {
+					swal("恭喜", "你共花费了" + seconds + "秒,获得" + $('.fa-star').length + "颗星", "success", {
+  						button: "重新开始",
 
-					}).then(function(){
-						restartGame();
-					});
+				}).then(function(){
+					restartGame();
+				});
+			}
+			
+		}
+		setTimeout(function(){
+				for (const card of selectedCards){
+					card.removeClass('open show animated bounce').addClass('match')
+					selectedCards = [];
 				}
-			},1000)
-			
-		}
+				
+		},1000)
 	} else {
-		for (var card of selectedCards){
-			card.addClass('animated shake')
-			setTimeout(function(){
-				card.removeClass('open show');
-			},1000)
-			
+		for (const card of selectedCards){
+			card.addClass('animated shake error')
 		}
+		setTimeout(function(){
+			for (const card of selectedCards){
+				card.removeClass('open show animated shake error');
+				selectedCards = [];
+			}
+		},1000)
 	}
-	selectedCards = [];
+	
 }
 //bind restart button and card click event
 function bindEvent() {
@@ -129,7 +138,7 @@ function restartGame(){
 	createRandomCard();
 	moveCount = 0;
 	rightCount = 0;
-	second = 0;
+	seconds = 0;
 	selectedCards = [];
 	$('.stars').empty();
     $('.stars').append('<li><i class="fa fa-star"></i></li>', '<li><i class="fa fa-star"></i></li>', '<li><i class="fa fa-star"></i></li>');
