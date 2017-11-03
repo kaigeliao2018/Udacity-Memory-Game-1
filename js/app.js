@@ -1,3 +1,4 @@
+'use strict';
 /*
  * Create a list that holds all of your cards
  */
@@ -19,7 +20,7 @@ var rightCount = 0;
 var cardCSSArray = ["fa fa-diamond","fa fa-paper-plane-o","fa fa-anchor","fa fa-bolt","fa fa-cube","fa fa-anchor","fa fa-leaf","fa fa-bicycle",
 	"fa fa-diamond","fa fa-bomb","fa fa-leaf","fa fa-bomb","fa fa-bolt","fa fa-bicycle","fa fa-paper-plane-o","fa fa-cube"];
 var seconds = 0;
-
+// var $example = $(".example");  定义Jquery搜寻到的元素为全局变量,避免多次使用$()耗资源
 
 
 function shuffle(array) {
@@ -79,7 +80,14 @@ function handleStar() {
 function matchCard() {
 	if (selectedCards[0].html() === selectedCards[1].html()) {
 		for (const card of selectedCards){
+			//const是块级作用域 var是函数作用域,用var setTimeout会出问题
 			card.addClass('animated bounce');
+			setTimeout(function(){
+				// for (const card of selectedCards){
+					card.removeClass('open show animated bounce').addClass('match')
+					selectedCards = [];
+				// }
+			},1000)
 			rightCount++;
 			if (rightCount === cardCSSArray.length) {
 					swal("恭喜", "你共花费了" + seconds + "秒,获得" + $('.fa-star').length + "颗星", "success", {
@@ -90,24 +98,19 @@ function matchCard() {
 				});
 			}
 			
+			
 		}
-		setTimeout(function(){
-				for (const card of selectedCards){
-					card.removeClass('open show animated bounce').addClass('match')
-					selectedCards = [];
-				}
-				
-		},1000)
 	} else {
 		for (const card of selectedCards){
 			card.addClass('animated shake error')
-		}
-		setTimeout(function(){
-			for (const card of selectedCards){
+			setTimeout(function(){
+			// for (const card of selectedCards){
 				card.removeClass('open show animated shake error');
 				selectedCards = [];
-			}
+			// }
 		},1000)
+			
+		}
 	}
 	
 }
